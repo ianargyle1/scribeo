@@ -45,7 +45,10 @@ export const getUserData = () => {
   if (!isLoggedIn) {
     throw 'No user logged in.'
   }
-  var user = localStorage.getItem('scribeoUser');
+  var user; 
+  if (typeof window !== 'undefined') {
+    user = localStorage.getItem('scribeoUser');
+  }
   if (user !== undefined) {
     return JSON.parse(user);
   } else {
@@ -69,7 +72,9 @@ export const setUser = async () => {
     })
   });
   var json = await resp.json()
-  localStorage.setItem('scribeoUser', JSON.stringify(json));
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('scribeoUser', JSON.stringify(json));
+  }
   return;
 }
 

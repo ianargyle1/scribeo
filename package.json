@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@loadable/component": "^5.15.0",
-    "bootstrap": "4.3.1",
+    "bootstrap": "^4.3.1",
     "classnames": "2.2.6",
     "draft-js": "^0.11.7",
     "firebase": "^8.6.2",
@@ -39,7 +39,7 @@
     "suneditor-react": "^3.3.0"
   },
   "devDependencies": {
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.14.1",
     "prettier": "2.2.1"
   },
   "keywords": [
@@ -57,9 +57,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+    "url": "git+https://github.com/gatsbyjs/gatsby-starter-default.git"
   },
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
-  }
+  },
+  "description": "<!-- AUTO-GENERATED-CONTENT:START (STARTER) -->\r <p align=\"center\">\r   <a href=\"https://www.gatsbyjs.com\">\r     <img alt=\"Gatsby\" src=\"https://www.gatsbyjs.com/Gatsby-Monogram.svg\" width=\"60\" />\r   </a>\r </p>\r <h1 align=\"center\">\r   Gatsby's default starter\r </h1>",
+  "homepage": "https://github.com/gatsbyjs/gatsby-starter-default#readme",
+  "version": "1.0.0",
+  "main": "gatsby-browser.js",
+  "author": ""
 }
