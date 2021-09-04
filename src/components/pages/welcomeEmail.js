@@ -10,7 +10,7 @@ const WelcomeEmail = ({ component: Component, ...rest }) => {
 //   }
 
   return (
-      <Admin component={Email} pageName="Welcome Email" type="welcome" />
+      <Admin component={Email} pageName="Welcome Email" type="welcome" {...rest}  />
   );
 }
 

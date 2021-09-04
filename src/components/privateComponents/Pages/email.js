@@ -22,6 +22,7 @@ import EditCard from '../Components/editCard'
 import SelectionCard from '../Components/selectionCard'
 import { createConent } from "../../../utils/createContent";
 import { verify } from "../../../utils/verify";
+import { saveProject } from "../../../utils/saveProject";
 import StepContainer from '../Components/stepContainer';
 import FormController from '../Components/formController';
 import Selector from '../Components/selector'
@@ -36,10 +37,17 @@ class Email extends React.Component {
             step: 1,
             values: {},
             subjects: [],
+            fulltext: '',
             error: false,
             errorMsg: '',
             errorIds: [],
             loading: false
+        }
+
+        if (this.props.location && this.props.location.state) {
+            for (const key in this.props.location.state) {
+                this.state[key] = this.props.location.state[key];
+            }
         }
 
         this.setAPIValue = this.setAPIValue.bind(this);
@@ -47,6 +55,7 @@ class Email extends React.Component {
         this.handleBack = this.handleBack.bind(this);
         this.handleStep1Next = this.handleStep1Next.bind(this);
         this.handleSubjectsNext = this.handleSubjectsNext.bind(this);
+        this.save = this.save.bind(this);
     }
 
     setAPIValue (key, value) {
@@ -118,9 +127,18 @@ class Email extends React.Component {
         }
     }
 
+    async save () {
+        try {
+            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+            await saveProject({ name: 'test project', time: Date.now(), fields: { subjects: this.state.subjects, fulltext: this.state.fulltext, values: this.state.values } })
+        } catch {
+            this.setState({ errorMsg: 'Unable to save project. Please try again.', error: true, loading: false });
+        }
+    }
+
     render() {
         return (
-            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} >
+            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} saveHandler={this.save} >
                 <div step='1' handleNext={this.handleStep1Next} title={this.props.pageName}>
                     <FormController updateValues={this.updateValues} errorIds={this.state.errorIds} currentValues={this.state.values}>
                         <div

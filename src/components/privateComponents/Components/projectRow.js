@@ -1,4 +1,5 @@
 import React from "react";
+import { navigate } from 'gatsby';
 
 import {
     Table
@@ -17,7 +18,7 @@ class ProjectRow extends React.Component {
     }
 
     handleSelect (e) {
-        //navigate(this.props.to);
+        navigate('/app/welcome-email', { state: { ...this.props.data.fields } });
     }
 
     handleMouseEnter (e) {
@@ -30,9 +31,9 @@ class ProjectRow extends React.Component {
 
     render () {
         return (
-            <tr style={{ backgroundColor: this.state.color, cursor: 'pointer' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-                <td>{this.props.data.name}</td>
-                <td>{this.props.data.date}</td>
+            <tr style={{ backgroundColor: this.state.color, cursor: 'pointer' }} onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onClick={this.handleSelect}>
+                <td>{this.props.name}</td>
+                <td>{this.props.data.time._seconds}</td>
                 <td><i className="ni ni-fat-remove" style={{fontSize: '1.5em'}}></i></td>
             </tr>
         );

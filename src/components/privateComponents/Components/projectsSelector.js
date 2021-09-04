@@ -18,8 +18,8 @@ function ProjectsSelector (props) {
             </thead>
             <tbody>
                 {user.projects ?
-                    user.projects.map(project => (
-                        <ProjectRow data={{ name: project.name, date: project.time._seconds }} />
+                    Object.keys(user.projects).map(name => (
+                        <ProjectRow name={name} data={user.projects[name]} />
                     ))
                 : <p>No projects yet, create one below</p>}
             </tbody>

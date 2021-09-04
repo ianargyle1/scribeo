@@ -63,6 +63,9 @@ class StepContainer extends React.Component {
                                                     {child.props.reloadHandler && typeof child.props.reloadHandler == 'function' ?
                                                         <img src={require("../../../images/reload_icon.png").default} onClick={child.props.reloadHandler} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer' }} />
                                                     : null }
+                                                    {this.props.saveHandler && typeof this.props.saveHandler == 'function' ?
+                                                        <img src={require("../../../images/save_icon.png").default} onClick={this.props.saveHandler} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer', marginRight: '1em' }} />
+                                                    : null }
                                                 </CardHeader>
                                                 {child}
                                                 { this.props.error ? 
