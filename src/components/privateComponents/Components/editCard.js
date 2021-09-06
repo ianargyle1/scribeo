@@ -61,6 +61,7 @@ class EditCard extends React.Component {
             if (this.state.newText == '' && this.state.text.trim() != '') {
                 this.setState({ edit: false, editText: 'Edit' });
             } else {
+                this.props.onChange(this.state.newText, this.props.index);
                 this.setState({ edit: false, editText: 'Edit', text: this.state.newText });
             }
         } else {

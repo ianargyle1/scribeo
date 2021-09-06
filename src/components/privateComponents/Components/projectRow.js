@@ -14,7 +14,7 @@ class ProjectRow extends React.Component {
             color: 'white'
         }
     
-        past = Math.floor(Date.now() / 1000) - this.props.data.time._seconds;
+        past = Math.floor((Date.now() - this.props.data.time) / 1000);
 
         this.handleSelect = this.handleSelect.bind(this);
         this.handleMouseEnter = this.handleMouseEnter.bind(this);
@@ -22,7 +22,7 @@ class ProjectRow extends React.Component {
     }
 
     handleSelect (e) {
-        navigate('/app/' + this.props.data.type, { state: { ...this.props.data.fields } });
+        navigate('/app/' + this.props.data.type, { state: { ...this.props.data } });
     }
 
     handleMouseEnter (e) {

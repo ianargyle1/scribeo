@@ -1,5 +1,6 @@
 import firebase from "gatsby-plugin-firebase"
 import { isLoggedIn } from "./auth";
+import { setUser } from "./auth";
 
 export const saveProject = async (project) => {
   if (!isLoggedIn()) {
@@ -18,6 +19,7 @@ export const saveProject = async (project) => {
     })
   });
   if (resp.status == 200) {
+      setUser();
       return;
   } else {
       throw 'Unable to save project.'

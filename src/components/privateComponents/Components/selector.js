@@ -39,7 +39,7 @@ class Selector extends React.Component {
         return (
             <>
                 {this.props.choices.map((choice, index) =>
-                    <EditCard text={choice} index={index} selected={index == this.state.index ? true : false} handleSelect={this.updateSelection} handleDeselect={this.handleDeselect} />
+                    <EditCard text={choice} index={index} selected={index == this.state.index ? true : false} onChange={this.props.onChange} handleSelect={this.updateSelection} handleDeselect={this.handleDeselect} />
                 )}
             </>
         );

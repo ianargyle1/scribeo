@@ -17,7 +17,7 @@ import {
 const RTE = props => {
     return (
         <>
-            <ReactQuill value={props.text.replaceAll('\n', '<br />')} />
+            <ReactQuill value={props.text.replaceAll('\n', '<br />')} onChange={props.handleChange} />
             {/* <FroalaEditor
                 tag='textarea'
                 config={{ placeholderText: props.text }}

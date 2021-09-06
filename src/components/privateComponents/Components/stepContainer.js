@@ -17,6 +17,9 @@ import {
   Popover,
   PopoverBody
 } from "reactstrap";
+import { saveProject } from "../../../utils/saveProject";
+import { verify } from "../../../utils/verify";
+import { createConent } from "../../../utils/createContent";
 import "../../../assets/vendor/nucleo/css/nucleo.css";
 import "../../../assets/css/custom.css";
 
@@ -25,26 +28,102 @@ class StepContainer extends React.Component {
         super(props);
 
         this.state = {
+            step: this.props.step,
+            loading: false,
             error: false,
             errorMsg: '',
-            showNext: false
+            showNext: false,
+            promptName: false
         }
 
         this.handleNext = this.handleNext.bind(this);
         this.handleBack = this.handleBack.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.handleStepNext = this.handleStepNext.bind(this);
+        this.verifyResp = this.verifyResp.bind(this);
+        this.handleReload = this.handleReload.bind(this);
     }
 
     handleNext () {
         for (var i = 0; i < this.props.children.length; i++) {
-            if (this.props.children[i].props.step == this.props.step && (('showWhen' in this.props.children[i].props && this.props.children[i].props.showWhen) || !('showWhen' in this.props.children[i].props))) {
-                this.props.children[i].props.handleNext();
+            console.log('mild', this.props.children[i])
+            if (this.props.children[i].props.step == this.state.step && (('showWhen' in this.props.children[i].props && this.props.children[i].props.showWhen) || !('showWhen' in this.props.children[i].props))) {
+                console.log('mild')
+                this.handleStepNext(this.props.children[i].props.next);
                 break;
             }
         }
     }
 
+    handleStepNext ({required, type, values, key}, reload=false) {
+        var missing = verify(required, values);
+        if (missing.length > 0) {
+            this.props.setErrorIds(missing);
+            this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true });
+        } else {
+            this.props.setErrorIds([]);
+            this.setState({ errorMsg: '', error: false, loading: true });
+
+            var apiProps = {
+                type: type,
+                ...values
+            }
+            createConent(apiProps).then(resp => {
+                if (this.verifyResp(resp)) {
+                    if (Array.isArray(resp.response) && resp.response.length > 1) {
+                        this.props.updateValues(key, resp.response);
+                    } else if (Array.isArray(resp.response) && resp.response.length === 1) {
+                        this.props.updateValues(key, resp.response[0]);
+                    } else {
+                        this.props.updateValues(key, resp.response);
+                    }
+                    if (reload) {
+                        this.setState({ loading: false });
+                    } else {
+                        this.setState({ step: this.state.step+1, loading: false });
+                    }
+                }
+            }).catch((e) => {
+                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+            });
+        }
+    }
+
+    verifyResp (resp) {
+        if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
+            return true;
+        } else {
+            this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+        }
+    }
+
     handleBack () {
-        this.props.handleBack();
+        if (this.state.step > 1) {
+            this.setState({ step: this.state.step-1 });
+        }
+    }
+
+    handleSave () {
+        if (!this.props.save.name.trim()) {
+            this.setState({ promptName: true });
+        } else {
+            try {
+                this.setState({ promptName: false });
+                saveProject({ time: Date.now(), step: this.state.step, ...this.props.save });
+            } catch (e) {
+                console.log(e);
+                this.setState({ errorMsg: 'Unable to save project. Please try again.', error: true, loading: false });
+            }
+        }
+    }
+
+    handleReload () {
+        for (var i = 0; i < this.props.children.length; i++) {
+            if (this.props.children[i].props.step == this.state.step - 1 && (('showWhen' in this.props.children[i].props && this.props.children[i].props.showWhen) || !('showWhen' in this.props.children[i].props))) {
+                this.handleStepNext(this.props.children[i].props.next, true);
+                break;
+            }
+        }
     }
 
     render() {
@@ -55,17 +134,15 @@ class StepContainer extends React.Component {
                         <Card className="shadow">
                             <CardBody>
                                 {this.props.children.map(child => (
-                                    child.props.step == this.props.step ?
+                                    child.props.step == this.state.step ?
                                         ('showWhen' in child.props && child.props.showWhen) || !('showWhen' in child.props) ?
                                             <>
                                                 <CardHeader className="bg-transparent border-0" style={{ paddingLeft: '0', paddingRight: '0' }}>
                                                     {child.props.title ? <span style={{ fontSize: '1.5em', fontWeight: '600' }}>{child.props.title}</span> : null}
-                                                    {child.props.reloadHandler && typeof child.props.reloadHandler == 'function' ?
-                                                        <img src={require("../../../images/reload_icon.png").default} onClick={child.props.reloadHandler} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer' }} />
+                                                    {this.state.step > 1 ?
+                                                        <img src={require("../../../images/reload_icon.png").default} onClick={this.handleReload} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer' }} />
                                                     : null }
-                                                    {this.props.saveHandler && typeof this.props.saveHandler == 'function' ?
-                                                        <img src={require("../../../images/save_icon.png").default} onClick={this.props.saveHandler} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer', marginRight: '1em' }} />
-                                                    : null }
+                                                    <img src={require("../../../images/save_icon.png").default} onClick={this.handleSave} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer', marginRight: '1em' }} />
                                                 </CardHeader>
                                                 {child}
                                                 { this.props.error ? 
@@ -75,7 +152,7 @@ class StepContainer extends React.Component {
                                                         </Alert>
                                                     </Col>
                                                 : null }
-                                                { parseInt(this.props.step) > 1 ?
+                                                { parseInt(this.state.step) > 1 ?
                                                     <Button
                                                         className="my-4"
                                                         color="secondary"
@@ -86,7 +163,7 @@ class StepContainer extends React.Component {
                                                         Back
                                                     </Button>
                                                 : null }
-                                                { child.props.handleNext && typeof child.props.handleNext == 'function' ?
+                                                { child.props.next && child.props.next.type ?
                                                     <Button
                                                         className="my-4"
                                                         color="primary"
@@ -102,7 +179,7 @@ class StepContainer extends React.Component {
                                         : null
                                     : null
                                 ))}
-                                { this.props.loading ? 
+                                { this.state.loading ? 
                                     <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                                         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
                                             <div style={{ textAlign: 'center' }}>
@@ -110,6 +187,40 @@ class StepContainer extends React.Component {
                                                 <p style={{ fontSize: '1.2em', color: 'white', paddingBottom: '1em' }}>This can take up to a minute. Do not navigate away from this page.</p>
                                                 <span class="loader"></span>
                                             </div>
+                                        </div>
+                                    </div>
+                                : null}
+                                { this.state.promptName ?
+                                    <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={() => this.setState({ promptName: false })}>
+                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                                            <Card onClick={(e) => e.stopPropagation()}>
+                                                <CardBody>
+                                                    <p>Please enter a project name.</p>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        onChange={this.props.updateName}
+                                                        type="text"
+                                                    />
+                                                    <Button
+                                                        className="mt-4"
+                                                        color="secondary"
+                                                        type="button"
+                                                        onClick={() => this.setState({ promptName: false })}
+                                                        disabled={this.props.disabled}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                    <Button
+                                                        className="mt-4"
+                                                        color="primary"
+                                                        type="button"
+                                                        onClick={this.handleSave}
+                                                        style={{ float: 'right' }}
+                                                    >
+                                                        Save
+                                                    </Button>
+                                                </CardBody>
+                                            </Card>
                                         </div>
                                     </div>
                                 : null}

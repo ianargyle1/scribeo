@@ -6,9 +6,9 @@ import {
 import ProjectRow from "./projectRow";
 import { getUserData } from "../../../utils/auth"
 
-const user = getUserData();
-
 function ProjectsSelector (props) {
+    var user = getUserData();
+    console.log(user)
     return (
         <Table>
             <thead>

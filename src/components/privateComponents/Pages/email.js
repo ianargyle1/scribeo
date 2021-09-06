@@ -22,7 +22,6 @@ import EditCard from '../Components/editCard'
 import SelectionCard from '../Components/selectionCard'
 import { createConent } from "../../../utils/createContent";
 import { verify } from "../../../utils/verify";
-import { saveProject } from "../../../utils/saveProject";
 import StepContainer from '../Components/stepContainer';
 import FormController from '../Components/formController';
 import Selector from '../Components/selector'
@@ -35,13 +34,14 @@ class Email extends React.Component {
         super(props);
         this.state = {
             step: 1,
+            name: '',
             values: {},
-            subjects: [],
-            fulltext: '',
-            error: false,
-            errorMsg: '',
-            errorIds: [],
-            loading: false
+            // subjects: [],
+            // fulltext: '',
+            // error: false,
+            // errorMsg: '',
+            // errorIds: [],
+            // loading: false
         }
 
         console.log(this.props.location)
@@ -49,24 +49,23 @@ class Email extends React.Component {
             for (const key in this.props.location.state) {
                 if (key in this.state) {
                     this.state[key] = this.props.location.state[key];
-                    console.log(key + ': ' + this.props.location.state[key])
                 }
             }
         }
 
-        this.setAPIValue = this.setAPIValue.bind(this);
+        this.setErrorIds = this.setErrorIds.bind(this);
+        // this.setAPIValue = this.setAPIValue.bind(this);
         this.updateValues = this.updateValues.bind(this);
-        this.handleBack = this.handleBack.bind(this);
-        this.handleStep1Next = this.handleStep1Next.bind(this);
-        this.handleSubjectsNext = this.handleSubjectsNext.bind(this);
-        this.save = this.save.bind(this);
+        // this.handleBack = this.handleBack.bind(this);
+        // this.handleStep1Next = this.handleStep1Next.bind(this);
+        // this.handleSubjectsNext = this.handleSubjectsNext.bind(this);
     }
 
-    setAPIValue (key, value) {
-        var current = this.state.values;
-        current[key] = value;
-        this.setState({ values: current });
-    }
+    // setAPIValue (key, value) {
+    //     var current = this.state.values;
+    //     current[key] = value;
+    //     this.setState({ values: current });
+    // }
 
     updateValues (key, value) {
         var current = this.state.values;
@@ -74,77 +73,63 @@ class Email extends React.Component {
         this.setState({ values: current });
     }
 
-    handleBack () {
-        if (this.state.step > 1) {
-            this.setState({ step: this.state.step-1 });
-        }
-    }
+    // handleBack () {
+    //     if (this.state.step > 1) {
+    //         this.setState({ step: this.state.step-1 });
+    //     }
+    // }
 
-    verifyResp (resp) {
-        if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
-            return true;
-        } else {
-            this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-        }
-    }
+    // handleStep1Next () {
+    //     var required = ['business', 'description'];
+    //     var missing = verify(required, this.state.values);
+    //     if (missing.length > 0) {
+    //         this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true, errorIds: missing });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
 
-    handleStep1Next () {
-        var required = ['business', 'description'];
-        var missing = verify(required, this.state.values);
-        if (missing.length > 0) {
-            this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true, errorIds: missing });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+    //         var apiProps = {
+    //             type: this.props.type + '_email_subject',
+    //             ...this.state.values
+    //         }
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ subjects: resp.response, step: 2, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
 
-            var apiProps = {
-                type: this.props.type + '_email_subject',
-                ...this.state.values
-            }
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ subjects: resp.response, step: 2, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
-    }
+    // handleSubjectsNext () {
+    //     if (!this.state.values.subject || this.state.values.subject.trim() == '') {
+    //         this.setState({ errorMsg: 'Please select at least one subject.', error: true });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
 
-    handleSubjectsNext () {
-        if (!this.state.values.subject || this.state.values.subject.trim() == '') {
-            this.setState({ errorMsg: 'Please select at least one subject.', error: true });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+    //         var apiProps = {
+    //             type: this.props.type + '_email_fulltext' + (this.state.values.cta && this.state.values.cta.trim() ? '_cta' : ''),
+    //             ...this.state.values
+    //         }
 
-            var apiProps = {
-                type: this.props.type + '_email_fulltext' + (this.state.values.cta && this.state.values.cta.trim() ? '_cta' : ''),
-                ...this.state.values
-            }
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ fulltext: resp.response[0], step: 3, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
 
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ fulltext: resp.response[0], step: 3, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
-    }
-
-    async save () {
-        try {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
-            await saveProject({ name: 'test project', time: Date.now(), type: this.props.type + '-email', fields: { step: this.state.step, subjects: this.state.subjects, fulltext: this.state.fulltext, values: this.state.values } })
-        } catch (e) {
-            console.log(e);
-            this.setState({ errorMsg: 'Unable to save project. Please try again.', error: true, loading: false });
-        }
+    setErrorIds (ids) {
+        this.setState({errorIds: ids});
     }
 
     render() {
         return (
-            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} saveHandler={this.save} >
-                <div step='1' handleNext={this.handleStep1Next} title={this.props.pageName}>
+            <StepContainer save={{name: this.state.name, type: this.props.type + '-email', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step}>
+                <div step='1' title={this.props.pageName} next={{required: ['business', 'description'], type: this.props.type + '_email_subject', values: this.state.values, key: 'subjects'}}>
                     <FormController updateValues={this.updateValues} errorIds={this.state.errorIds} currentValues={this.state.values}>
                         <div
                             required={true}
@@ -186,13 +171,13 @@ class Email extends React.Component {
                         />
                     </FormController>
                 </div>
-                <div step='2' handleNext={this.handleSubjectsNext} reloadHandler={this.handleStep1Next} title='Subject Lines'>
+                <div step='2' save={{name: this.state.name, type: this.props.type + '-email', values: this.state.values}} next={{required: ['business', 'description', 'subject'], type: this.props.type + '_email_fulltext' + (this.state.values.cta && this.state.values.cta.trim() ? '_cta' : ''), values: this.state.values, updateValues: this.updateValues, key: 'fulltext'}} title='Subject Lines'>
                     <p>Select or edit your favorite subject line below.</p>
-                    <Selector choices={this.state.subjects} key={this.state.subjects} selected={this.state.values.subject} handleSelect={(text) => this.setAPIValue('subject', text)} handleDeselect={() => this.setAPIValue('subject', '')} />
+                    <Selector choices={this.state.values.subjects} selected={this.state.values.subject} handleSelect={(text) => this.updateValues('subject', text)} handleDeselect={() => this.updateValues('subject', '')} onChange={(text, index) => { var vals = this.state.values; vals.subjects[index] = text; this.setState({ values: vals }) } } />
                 </div>
-                <div step='3' reloadHandler={this.handleSubjectsNext} title='Full Email'>
+                <div step='3' title='Full Email'>
                     <p>Edit and copy your email below.</p>
-                    <RichTextEditor key={this.state.fulltext} text={this.state.fulltext} />
+                    <RichTextEditor key={this.state.values.fulltext} text={this.state.values.fulltext} onChange={(text) => console.log(text)} />
                 </div>
             </StepContainer>
         );
