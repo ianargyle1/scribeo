@@ -57,14 +57,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gatsbyjs/gatsby-starter-default.git"
+    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
   },
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
-  },
-  "description": "<!-- AUTO-GENERATED-CONTENT:START (STARTER) -->\r <p align=\"center\">\r   <a href=\"https://www.gatsbyjs.com\">\r     <img alt=\"Gatsby\" src=\"https://www.gatsbyjs.com/Gatsby-Monogram.svg\" width=\"60\" />\r   </a>\r </p>\r <h1 align=\"center\">\r   Gatsby's default starter\r </h1>",
-  "homepage": "https://github.com/gatsbyjs/gatsby-starter-default#readme",
-  "version": "1.0.0",
-  "main": "gatsby-browser.js",
-  "author": ""
+  }
 }
