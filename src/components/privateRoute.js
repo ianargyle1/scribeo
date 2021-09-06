@@ -3,7 +3,7 @@ import { navigate } from "gatsby"
 import { isLoggedIn } from "../utils/auth"
 
 const PrivateRoute = ({ component: Component, location, ...rest }) => {
-  if (!isLoggedIn() && location.pathname !== `/login`) {
+  if (!isLoggedIn && location.pathname !== `/login`) {
     navigate("/login")
     return null
   }

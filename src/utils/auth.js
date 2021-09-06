@@ -46,13 +46,13 @@ export const getUserData = () => {
     throw 'No user logged in.'
   }
   var user; 
-  if (typeof window !== 'undefined') {
+  if (isBrowser()) {
     user = localStorage.getItem('scribeoUser');
   }
   if (user !== undefined) {
     return JSON.parse(user);
   } else {
-    throw 'Could not retrieve user.'
+    return {};
   }
 }
 
