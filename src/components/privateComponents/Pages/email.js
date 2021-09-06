@@ -44,9 +44,13 @@ class Email extends React.Component {
             loading: false
         }
 
+        console.log(this.props.location)
         if (this.props.location && this.props.location.state) {
             for (const key in this.props.location.state) {
-                this.state[key] = this.props.location.state[key];
+                if (key in this.state) {
+                    this.state[key] = this.props.location.state[key];
+                    console.log(key + ': ' + this.props.location.state[key])
+                }
             }
         }
 
@@ -130,8 +134,9 @@ class Email extends React.Component {
     async save () {
         try {
             this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
-            await saveProject({ name: 'test project', time: Date.now(), fields: { subjects: this.state.subjects, fulltext: this.state.fulltext, values: this.state.values } })
-        } catch {
+            await saveProject({ name: 'test project', time: Date.now(), type: this.props.type + '-email', fields: { step: this.state.step, subjects: this.state.subjects, fulltext: this.state.fulltext, values: this.state.values } })
+        } catch (e) {
+            console.log(e);
             this.setState({ errorMsg: 'Unable to save project. Please try again.', error: true, loading: false });
         }
     }

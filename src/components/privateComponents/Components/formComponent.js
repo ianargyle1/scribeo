@@ -17,7 +17,7 @@ class FormComponent extends React.Component {
         this.state = {
             keywords: [],
             chk: this.props.value,
-            characters: 0,
+            characters: this.props.value ? this.props.value.length : 0,
             dropdownOpen: false
         }
 
