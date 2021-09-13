@@ -145,10 +145,10 @@ class StepContainer extends React.Component {
                                                     <img src={require("../../../images/save_icon.png").default} onClick={this.handleSave} style={{ verticalAlign: 'middle', textAlign: 'right', width: '1.5em', opacity: '0.6', float: 'right', cursor: 'pointer', marginRight: '1em' }} />
                                                 </CardHeader>
                                                 {child}
-                                                { this.props.error ? 
+                                                { this.state.error ? 
                                                     <Col className="align-middle">
                                                         <Alert color="danger" className="mb-0 mt-4">
-                                                            <strong>Error.</strong> {this.props.errorMsg}
+                                                            <strong>Error.</strong> {this.state.errorMsg}
                                                         </Alert>
                                                     </Col>
                                                 : null }

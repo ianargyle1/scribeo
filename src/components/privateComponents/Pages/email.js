@@ -171,7 +171,7 @@ class Email extends React.Component {
                         />
                     </FormController>
                 </div>
-                <div step='2' save={{name: this.state.name, type: this.props.type + '-email', values: this.state.values}} next={{required: ['business', 'description', 'subject'], type: this.props.type + '_email_fulltext' + (this.state.values.cta && this.state.values.cta.trim() ? '_cta' : ''), values: this.state.values, updateValues: this.updateValues, key: 'fulltext'}} title='Subject Lines'>
+                <div step='2' next={{required: ['business', 'description', 'subject'], type: this.props.type + '_email_fulltext' + (this.state.values.cta && this.state.values.cta.trim() ? '_cta' : ''), values: this.state.values, updateValues: this.updateValues, key: 'fulltext'}} title='Subject Lines'>
                     <p>Select or edit your favorite subject line below.</p>
                     <Selector choices={this.state.values.subjects} selected={this.state.values.subject} handleSelect={(text) => this.updateValues('subject', text)} handleDeselect={() => this.updateValues('subject', '')} onChange={(text, index) => { var vals = this.state.values; vals.subjects[index] = text; this.setState({ values: vals }) } } />
                 </div>

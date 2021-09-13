@@ -34,25 +34,18 @@ class FAQ extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            name: '',
             step: 1,
             values: {},
-            questions: [],
-            error: false,
-            errorMsg: '',
-            errorIds: [],
-            loading: false
+            // questions: [],
+            // error: false,
+            // errorMsg: '',
+            // errorIds: [],
+            // loading: false
         }
 
-        this.setAPIValue = this.setAPIValue.bind(this);
+        this.setErrorIds = this.setErrorIds.bind(this);
         this.updateValues = this.updateValues.bind(this);
-        this.handleBack = this.handleBack.bind(this);
-        this.handleStep1Next = this.handleStep1Next.bind(this);
-    }
-
-    setAPIValue (key, value) {
-        var current = this.state.values;
-        current[key] = value;
-        this.setState({ values: current });
     }
 
     updateValues (key, value) {
@@ -61,46 +54,50 @@ class FAQ extends React.Component {
         this.setState({ values: current });
     }
 
-    handleBack () {
-        if (this.state.step > 1) {
-            this.setState({ step: this.state.step-1 });
-        }
-    }
+    // handleBack () {
+    //     if (this.state.step > 1) {
+    //         this.setState({ step: this.state.step-1 });
+    //     }
+    // }
 
-    verifyResp (resp) {
-        if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
-            return true;
-        } else {
-            this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-        }
-    }
+    // verifyResp (resp) {
+    //     if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
+    //         return true;
+    //     } else {
+    //         this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //     }
+    // }
 
-    handleStep1Next () {
-        var required = ['product', 'description'];
-        var missing = verify(required, this.state.values);
-        if (missing.length > 0) {
-            this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true, errorIds: missing });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+    // handleStep1Next () {
+    //     var required = ['product', 'description'];
+    //     var missing = verify(required, this.state.values);
+    //     if (missing.length > 0) {
+    //         this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true, errorIds: missing });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
 
-            var apiProps = {
-                type: 'faq',
-                ...this.state.values
-            }
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ questions: resp.response, step: 2, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
+    //         var apiProps = {
+    //             type: 'faq',
+    //             ...this.state.values
+    //         }
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ questions: resp.response, step: 2, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
+
+    setErrorIds (ids) {
+        this.setState({errorIds: ids});
     }
 
     render() {
         return (
-            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} >
-                <div step='1' handleNext={this.handleStep1Next} title={this.props.pageName}>
+            <StepContainer save={{name: this.state.name, type: 'faq', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step} >
+                <div step='1' title={this.props.pageName} next={{required: ['product', 'description'], type: 'faq', values: this.state.values, key: 'questions'}}>
                     <FormController updateValues={this.updateValues} errorIds={this.state.errorIds} currentValues={this.state.values}>
                         <div
                             required={true}
@@ -123,9 +120,9 @@ class FAQ extends React.Component {
                         />
                     </FormController>
                 </div>
-                <div step='2' reloadHandler={this.handleStep1Next} title={this.props.pageName}>
+                <div step='2' title={this.props.pageName}>
                     <p>Copy your questions below.</p>
-                    {this.state.questions.map(question => 
+                    {this.state.values.questions.map(question => 
                         <DisplayCard text={question} />
                     )}
                 </div>

@@ -33,26 +33,13 @@ class EmailNoSummary extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            name: '',
             step: 1,
-            values: {},
-            subjects: [],
-            error: false,
-            errorMsg: '',
-            errorIds: [],
-            loading: false
+            values: {}
         }
 
-        this.setAPIValue = this.setAPIValue.bind(this);
+        this.setErrorIds = this.setErrorIds.bind(this);
         this.updateValues = this.updateValues.bind(this);
-        this.handleBack = this.handleBack.bind(this);
-        this.handleStep1Next = this.handleStep1Next.bind(this);
-        this.handleSubjectsNext = this.handleSubjectsNext.bind(this);
-    }
-
-    setAPIValue (key, value) {
-        var current = this.state.values;
-        current[key] = value;
-        this.setState({ values: current });
     }
 
     updateValues (key, value) {
@@ -61,67 +48,14 @@ class EmailNoSummary extends React.Component {
         this.setState({ values: current });
     }
 
-    handleBack () {
-        if (this.state.step > 1) {
-            this.setState({ step: this.state.step-1 });
-        }
-    }
-
-    verifyResp (resp) {
-        if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
-            return true;
-        } else {
-            this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-        }
-    }
-
-    handleStep1Next () {
-        var required = ['business', 'description'];
-        var missing = verify(required, this.state.values);
-        if (missing.length > 0) {
-            this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true, errorIds: missing });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
-
-            var apiProps = {
-                type: this.props.type + '_email_subject',
-                ...this.state.values
-            }
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ subjects: resp.response, step: 2, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
-    }
-
-    handleSubjectsNext () {
-        if (!this.state.values.subject || this.state.values.subject.trim() == '') {
-            this.setState({ errorMsg: 'Please select at least one subject.', error: true });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
-
-            var apiProps = {
-                type: this.props.type + '_email_fulltext',
-                ...this.state.values
-            }
-
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ fulltext: resp.response[0], step: 3, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
+    setErrorIds (ids) {
+        this.setState({errorIds: ids});
     }
 
     render() {
         return (
-            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} >
-                <div step='1' handleNext={this.handleStep1Next} title={this.props.pageName}>
+            <StepContainer save={{name: this.state.name, type: this.props.type + '-email', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step}>
+                <div step='1' title={this.props.pageName} next={{required: ['business', 'description'], type: this.props.type + '_email_subject', values: this.state.values, key: 'subjects'}}>
                     <FormController updateValues={this.updateValues} errorIds={this.state.errorIds} currentValues={this.state.values}>
                         <div
                             required={true}
@@ -144,13 +78,13 @@ class EmailNoSummary extends React.Component {
                         />
                     </FormController>
                 </div>
-                <div step='2' handleNext={this.handleSubjectsNext} reloadHandler={this.handleStep1Next} title='Subject Lines'>
+                <div step='2' title='Subject Lines' next={{required: ['business', 'description', 'subject'], type: this.props.type + '_email_fulltext', values: this.state.values, updateValues: this.updateValues, key: 'fulltext'}}>
                     <p>Select or edit your favorite subject line below.</p>
-                    <Selector choices={this.state.subjects} key={this.state.subjects} selected={this.state.values.subject} handleSelect={(text) => this.setAPIValue('subject', text)} handleDeselect={() => this.setAPIValue('subject', '')} />
+                    <Selector choices={this.state.values.subjects} selected={this.state.values.subject} handleSelect={(text) => this.updateValues('subject', text)} handleDeselect={() => this.updateValues('subject', '')} onChange={(text, index) => { var vals = this.state.values; vals.subjects[index] = text; this.setState({ values: vals }) } } />
                 </div>
                 <div step='3' reloadHandler={this.handleSubjectsNext} title='Full Email'>
                     <p>Edit and copy your email below.</p>
-                    <RichTextEditor key={this.state.fulltext} text={this.state.fulltext} />
+                    <RichTextEditor key={this.state.values.fulltext} text={this.state.values.fulltext} onChange={(text) => console.log(text)} />
                 </div>
             </StepContainer>
         );
