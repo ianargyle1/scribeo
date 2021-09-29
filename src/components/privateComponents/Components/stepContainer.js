@@ -55,7 +55,7 @@ class StepContainer extends React.Component {
         }
     }
 
-    handleStepNext ({required, type, values, key}, reload=false) {
+    handleStepNext ({required, type, values, key, postProcess}, reload=false) {
         var missing = verify(required, values);
         if (missing.length > 0) {
             this.props.setErrorIds(missing);
@@ -69,19 +69,29 @@ class StepContainer extends React.Component {
                 ...values
             }
             createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    if (Array.isArray(resp.response) && resp.response.length > 1) {
+                try {
+                    if (this.verifyResp(resp)) {
+                        if (Array.isArray(resp.response) && resp.response.length > 1) {
+                            if (typeof postProcess == 'function') {
+                                resp.response = postProcess(resp.response);
+                            }
+                        } else if (Array.isArray(resp.response) && resp.response.length === 1) {
+                            if (typeof postProcess == 'function') {
+                                resp.response = postProcess(resp.response[0]);
+                            }
+                            resp.response = resp.response[0];
+                        }
                         this.props.updateValues(key, resp.response);
-                    } else if (Array.isArray(resp.response) && resp.response.length === 1) {
-                        this.props.updateValues(key, resp.response[0]);
+                        if (reload) {
+                            this.setState({ loading: false });
+                        } else {
+                            this.setState({ step: this.state.step+1, loading: false });
+                        }
                     } else {
-                        this.props.updateValues(key, resp.response);
+                        this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
                     }
-                    if (reload) {
-                        this.setState({ loading: false });
-                    } else {
-                        this.setState({ step: this.state.step+1, loading: false });
-                    }
+                } catch {
+                    this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
                 }
             }).catch((e) => {
                 this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
