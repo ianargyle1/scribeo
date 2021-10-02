@@ -151,7 +151,7 @@ class FBLIAd extends React.Component {
 
     render() {
         return (
-            <StepContainer save={{name: this.state.name, type: 'fbli_ad', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step}>
+            <StepContainer save={{name: this.state.name, type: 'fbli-ad', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step}>
                 <div step='1' title={this.props.pageName} next={{required: ['product', 'features', 'cta'], type: 'fbli_ad', values: this.state.values, key: 'ad', postProcess: this.parseResponse}}>
                     <FormController updateValues={this.updateValues} errorIds={this.state.errorIds} currentValues={this.state.values}>
                         <div

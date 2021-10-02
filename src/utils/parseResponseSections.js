@@ -11,9 +11,9 @@ export const parseResponseSections = (sectionHeadings, text) => {
             regex = new RegExp('\\s+' + sectionHeadings[i] + ':?', 'g')
             split = text.split(regex);
         }
-        if (split.length != 2) {
-            throw 'Could not find ' + sectionHeadings[i] + ' in the text.';
-        }
+        // if (split.length != 2) {
+        //     throw 'Could not find ' + sectionHeadings[i] + ' in the text.';
+        // }
 
         var temp_text = split[1];
         if (i+1 < sectionHeadings.length) {
@@ -27,9 +27,9 @@ export const parseResponseSections = (sectionHeadings, text) => {
                 regex = new RegExp('\\s+' + sectionHeadings[i+1] + ':?', 'g')
                 split = temp_text.split(regex);
             }
-            if (split.length != 2) {
-                throw 'Could not find ' + sectionHeadings[i+1] + ' in the text.';
-            }
+            // if (split.length != 2) {
+            //     throw 'Could not find ' + sectionHeadings[i+1] + ' in the text.';
+            // }
             temp_text = split[0];
         }
         sections.push({ title: sectionHeadings[i], text: temp_text })
