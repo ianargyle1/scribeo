@@ -55,14 +55,23 @@ class StepContainer extends React.Component {
         }
     }
 
-    handleStepNext ({required, type, values, key, postProcess}, reload=false) {
-        var missing = verify(required, values);
+    handleStepNext ({required, type, values, key, preProcess, postProcess}, reload=false) {
+        var missing;
+        if (typeof required == 'function') {
+            missing = required();
+        } else {
+            missing = verify(required, values);
+        }
         if (missing.length > 0) {
             this.props.setErrorIds(missing);
             this.setState({ errorMsg: 'Please fill out the fields: ' + missing.join(', '), error: true });
         } else {
             this.props.setErrorIds([]);
             this.setState({ errorMsg: '', error: false, loading: true });
+
+            if (typeof preProcess === 'function') {
+                values = preProcess(values);
+            }
 
             var apiProps = {
                 type: type,

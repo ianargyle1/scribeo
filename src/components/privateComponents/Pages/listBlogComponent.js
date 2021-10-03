@@ -30,12 +30,12 @@ class ListBlogComponent extends React.Component {
         super(props);
         this.state = {
             step: 1,
-            listitems: [{ title: '', summary: '' }],
-            values: {},
-            titles: [],
-            topic: '',
-            title: '',
-            intro: '',
+            // listitems: [{ title: '', summary: '' }],
+            values: {listitems: [{ title: '', summary: '' }]},
+            // titles: [],
+            // topic: '',
+            // title: '',
+            // intro: '',
             error: false,
             errorMsg: '',
             errorIds: [],
@@ -43,55 +43,63 @@ class ListBlogComponent extends React.Component {
             addWarn: false
         }
 
-        this.setAPIValue = this.setAPIValue.bind(this);
-        this.updateItem = this.updateItem.bind(this);
-        this.handleBack = this.handleBack.bind(this);
-        this.handleStep1Next = this.handleStep1Next.bind(this);
-        this.handleTitlesNext = this.handleTitlesNext.bind(this);
-        this.handleIntrosNext = this.handleIntrosNext.bind(this);
+        // this.setAPIValue = this.setAPIValue.bind(this);
+        this.updateValues = this.updateValues.bind(this);
+        this.updateFormValues = this.updateFormValues.bind(this);
+        // this.handleBack = this.handleBack.bind(this);
+        // this.handleStep1Next = this.handleStep1Next.bind(this);
+        // this.handleTitlesNext = this.handleTitlesNext.bind(this);
+        // this.handleIntrosNext = this.handleIntrosNext.bind(this);
         this.addListItem = this.addListItem.bind(this);
         this.updateListItem = this.updateListItem.bind(this);
         this.removeListItem = this.removeListItem.bind(this);
         this.handleAddMouseEnter = this.handleAddMouseEnter.bind(this);
         this.handleAddMouseLeave = this.handleAddMouseLeave.bind(this);
+        this.errorCheck = this.errorCheck.bind(this);
+        this.setErrorIds = this.setErrorIds.bind(this);
+        this.stringifyListItems = this.stringifyListItems.bind(this);
     }
 
-    setAPIValue (key, value) {
-        var current = this.state.values;
-        current[key] = value;
-        this.setState({ values: current });
+    // setAPIValue (key, value) {
+    //     var current = this.state.values;
+    //     current[key] = value;
+    //     this.setState({ values: current });
+    // }
+
+    // handleBack () {
+    //     if (this.state.step > 1) {
+    //         this.setState({ step: this.state.step-1 });
+    //     }
+    // }
+
+    // verifyResp (resp) {
+    //     if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
+    //         return true;
+    //     } else {
+    //         this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //     }
+    // }
+
+    setErrorIds (ids) {
+        this.setState({errorIds: ids});
     }
 
-    handleBack () {
-        if (this.state.step > 1) {
-            this.setState({ step: this.state.step-1 });
-        }
-    }
-
-    verifyResp (resp) {
-        if ('response' in resp && 'length' in resp.response && resp.response.length > 0) {
-            return true;
-        } else {
-            this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-        }
-    }
-
-    handleStep1Next () {
+    errorCheck () {
         var ids = [];
 
         if (!('topic' in this.state.values) || this.state.values.topic.trim() == '') {
             ids.push('topic');
         }
 
-        if (this.state.listitems[0].title.trim() == '') {
+        if (this.state.values.listitems[0].title.trim() == '') {
             ids.push('0.title');
         }
-        if (this.state.listitems[0].summary.trim() == '') {
+        if (this.state.values.listitems[0].summary.trim() == '') {
             ids.push('0.summary');
         }
 
-        var completeItems = [];
-        this.state.listitems.forEach((item, index) => {
+        var completeItems = []; 
+        this.state.values.listitems.forEach((item, index) => {
             if (item) {
                 if (item.title.trim().length > 0 && item.summary.trim().length == 0) {
                     ids.push(index + '.summary');
@@ -103,77 +111,126 @@ class ListBlogComponent extends React.Component {
             }
         });
 
-        if (ids.length > 0) {
-            this.setState({ errorMsg: 'Please fill out all required fields.', error: true, errorIds: ids });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true, listitems: completeItems });
-
-            var apiProps = {
-                type: 'list_article_title',
-                topic: this.state.values.topic
-            }
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ titles: resp.response, step: 2, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
+        return ids;
     }
 
-    handleTitlesNext () {
-        if (!this.state.values.title || this.state.values.title.trim() == '') {
-            this.setState({ errorMsg: 'Please select a title.', error: true });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+    // handleStep1Next () {
+    //     var ids = [];
 
-            var apiProps = {
-                type: 'list_article_intro',
-                research: false,
-                title: this.state.values.title
-            }
+    //     if (!('topic' in this.state.values) || this.state.values.topic.trim() == '') {
+    //         ids.push('topic');
+    //     }
 
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ intros: resp.response, step: 3, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
+    //     if (this.state.listitems[0].title.trim() == '') {
+    //         ids.push('0.title');
+    //     }
+    //     if (this.state.listitems[0].summary.trim() == '') {
+    //         ids.push('0.summary');
+    //     }
+
+    //     var completeItems = [];
+    //     this.state.listitems.forEach((item, index) => {
+    //         if (item) {
+    //             if (item.title.trim().length > 0 && item.summary.trim().length == 0) {
+    //                 ids.push(index + '.summary');
+    //             } else if (item.title.trim().length == 0 && item.summary.trim().length > 0) {
+    //                 ids.push(index + '.title');
+    //             } else if (item.title.trim().length > 0 && item.summary.trim().length > 0) {
+    //                 completeItems.push(item)
+    //             }
+    //         }
+    //     });
+
+    //     if (ids.length > 0) {
+    //         this.setState({ errorMsg: 'Please fill out all required fields.', error: true, errorIds: ids });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true, listitems: completeItems });
+
+    //         var apiProps = {
+    //             type: 'list_article_title',
+    //             topic: this.state.values.topic
+    //         }
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ titles: resp.response, step: 2, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
+
+    // handleTitlesNext () {
+    //     if (!this.state.values.title || this.state.values.title.trim() == '') {
+    //         this.setState({ errorMsg: 'Please select a title.', error: true });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+
+    //         var apiProps = {
+    //             type: 'list_article_intro',
+    //             research: false,
+    //             title: this.state.values.title
+    //         }
+
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ intros: resp.response, step: 3, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
+
+    // handleIntrosNext () {
+    //     if (!this.state.values.intro || this.state.values.intro.trim() == '') {
+    //         this.setState({ errorMsg: 'Please select an intro.', error: true });
+    //     } else {
+    //         this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
+
+    //         var items = {};
+    //         this.state.listitems.forEach((item, index) => {
+    //             items['1.' + (index+1)] = 'Title: ' + item.title + '\n' + 'Summary: ' + item.summary;
+    //         });
+
+    //         var apiProps = {
+    //             type: 'list_article_fulltext',
+    //             ...this.state.values,
+    //             ...items
+    //         }
+
+    //         createConent(apiProps).then(resp => {
+    //             if (this.verifyResp(resp)) {
+    //                 this.setState({ fulltext: resp.response[0], step: 4, loading: false });
+    //             }
+    //         }).catch((e) => {
+    //             this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
+    //         });
+    //     }
+    // }
+
+    stringifyListItems (values) {
+        var items = {};
+        values.listitems.forEach((item, index) => {
+            items['1.' + (index+1)] = 'Title: ' + item.title + '\n' + 'Summary: ' + item.summary;
+        });
+        values = {
+            ...values,
+            ...items
         }
+        delete values.listitems;
+        return values;
     }
 
-    handleIntrosNext () {
-        if (!this.state.values.intro || this.state.values.intro.trim() == '') {
-            this.setState({ errorMsg: 'Please select an intro.', error: true });
-        } else {
-            this.setState({ errorMsg: '', error: false, errorIds: [], loading: true });
-
-            var items = {};
-            this.state.listitems.forEach((item, index) => {
-                items['1.' + (index+1)] = 'Title: ' + item.title + '\n' + 'Summary: ' + item.summary;
-            });
-
-            var apiProps = {
-                type: 'list_article_fulltext',
-                ...this.state.values,
-                ...items
-            }
-
-            createConent(apiProps).then(resp => {
-                if (this.verifyResp(resp)) {
-                    this.setState({ fulltext: resp.response[0], step: 4, loading: false });
-                }
-            }).catch((e) => {
-                this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
-            });
-        }
-    }
-
-    updateItem (e) {
+    updateFormValues (e) {
         var current = this.state.values;
         current[e.target.id] = e.target.value;
+        this.setState({ values: current });
+    }
+
+    updateValues (key, value) {
+        var current = this.state.values;
+        current[key] = value;
         this.setState({ values: current });
     }
 
@@ -181,14 +238,14 @@ class ListBlogComponent extends React.Component {
         const idx = e.target.id.split('.')[0];
         const type = e.target.id.split('.')[1];
 
-        var newlistitems = this.state.listitems;
-        newlistitems[idx][type] = e.target.value;
-        this.setState({ listitems: newlistitems });
+        var current = this.state.values;
+        current.listitems[idx][type] = e.target.value;
+        this.setState({ values: current });
     }
 
     addListItem () {
         var len = 0;
-        this.state.listitems.forEach(item => {
+        this.state.values.listitems.forEach(item => {
             if (item) {
                 len++;
             }
@@ -197,22 +254,21 @@ class ListBlogComponent extends React.Component {
         if (len >= 5) {
             this.setState({ addWarn: true });
         } else {
-            var newlistitems = this.state.listitems;
-            newlistitems.push({ title: '', summary: '' });
-            this.setState({ listitems: newlistitems });
+            var values = this.state.values;
+            values.listitems.push({ title: '', summary: '' });
+            this.setState({ values: values });
         }
     }
 
     removeListItem (e) {
-        var newlistitems = this.state.listitems;
-        newlistitems[e.target.id] = false;
-        console.log(e.target.id)
-        this.setState({ listitems: newlistitems });
+        var values = this.state.values;
+        values.listitems[e.target.id] = false;
+        this.setState({ values: values });
     }
 
     handleAddMouseEnter () {
         var len = 0;
-        this.state.listitems.forEach(item => {
+        this.state.values.listitems.forEach(item => {
             if (item) {
                 len++;
             }
@@ -229,10 +285,10 @@ class ListBlogComponent extends React.Component {
 
     render() {
         return (
-            <StepContainer step={this.state.step} disabled={false} error={this.state.error} errorMsg={this.state.errorMsg} loading={this.state.loading} handleBack={this.handleBack} >
-                <div step='1' handleNext={this.handleStep1Next} title={this.props.pageName}>
+            <StepContainer save={{name: this.state.name, type: 'list-blog', values: this.state.values}} setErrorIds={this.setErrorIds} updateValues={this.updateValues} updateName={(e) => this.setState({ name: e.target.value.trim() })} step={this.state.step}>
+                <div step='1' title={this.props.pageName} next={{required: this.errorCheck, type: 'list_article_title', values: this.state.values, key: 'titles'}}>
                     <FormComponent
-                        updateValue={this.updateItem}
+                        updateValue={this.updateFormValues}
                         value={this.state.values.topic}
                         errors={this.state.errorIds}
                         required={true}
@@ -249,7 +305,7 @@ class ListBlogComponent extends React.Component {
                         </label>
                         <p>Use the boxes below to enter a short title and description for each item you want included in your listicle.</p>
                     </FormGroup>
-                    {this.state.listitems.map((item, index) =>
+                    {this.state.values.listitems && this.state.values.listitems.map((item, index) =>
                         item ? 
                             <Card style={{ display: 'block', marginTop: '1.5em' }}>
                                 <CardBody style={{ backgroundColor: '#f8f9fa' }}>
@@ -299,17 +355,17 @@ class ListBlogComponent extends React.Component {
                         <span className="btn-inner--text">Add</span>
                     </Button>
                 </div>
-                <div step='2' handleNext={this.handleTitlesNext} reloadHandler={this.handleStep1Next} title='Titles'>
+                <div step='2' next={{required: ['title'], type: 'list_article_intro', values: this.state.values, updateValues: this.updateValues, key: 'intros'}} title='Titles'>
                     <p>Select or edit your favorite title below.</p>
-                    <Selector choices={this.state.titles} key={this.state.titles} selected={this.state.values.title} handleSelect={(text) => this.setAPIValue('title', text)} handleDeselect={() => this.setAPIValue('title', '')} />
+                    <Selector choices={this.state.values.titles} key={this.state.values.titles} selected={this.state.values.title} handleSelect={(text) => this.updateValues('title', text)} handleDeselect={() => this.updateValues('title', '')} />
                 </div>
-                <div step='3' handleNext={this.handleIntrosNext} reloadHandler={this.handleTitlesNext} title='Introductions'>
+                <div step='3' next={{required: ['intro'], type: 'list_article_fulltext', values: this.state.values, updateValues: this.updateValues, key: 'fulltext', preProcess: this.stringifyListItems}} title='Introductions'>
                     <p>Select or edit your favorite intro below.</p>
-                    <Selector choices={this.state.intros} key={this.state.intros} selected={this.state.values.intro} handleSelect={(text) => this.setAPIValue('intro', text)} handleDeselect={() => this.setAPIValue('intro', '')} />
+                    <Selector choices={this.state.values.intros} key={this.state.values.intros} selected={this.state.values.intro} handleSelect={(text) => this.updateValues('intro', text)} handleDeselect={() => this.updateValues('intro', '')} />
                 </div>
-                <div step='4' reloadHandler={this.handleIntrosNext} title='Full Blog Post'>
+                <div step='4' title='Full Blog Post'>
                     <p>Edit and copy your blog post below.</p>
-                    <RichTextEditor key={this.state.values.intro + '\n' + this.state.fulltext} text={this.state.values.intro + '\n' + this.state.fulltext} />
+                    <RichTextEditor key={this.state.values.intro + '\n' + this.state.values.fulltext} text={this.state.values.intro + '\n' + this.state.values.fulltext} />
                 </div>
             </StepContainer>
         );
