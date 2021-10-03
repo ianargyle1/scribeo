@@ -73,27 +73,72 @@ class StepContainer extends React.Component {
                     if (this.verifyResp(resp)) {
                         if (Array.isArray(resp.response) && resp.response.length > 1) {
                             if (typeof postProcess == 'function') {
-                                resp.response = postProcess(resp.response);
+                                var post = postProcess(resp.response);
+                                if (typeof post.then === 'function') {
+                                    post.then(r => {
+                                        this.props.updateValues(key, r);
+                                        if (reload) {
+                                            this.setState({ loading: false });
+                                        } else {
+                                            this.setState({ step: this.state.step+1, loading: false });
+                                        }
+                                    });
+                                } else {
+                                    resp.response = post;
+                                    this.props.updateValues(key, resp.response);
+                                    if (reload) {
+                                        this.setState({ loading: false });
+                                    } else {
+                                        this.setState({ step: this.state.step+1, loading: false });
+                                    }
+                                }
+                            } else {
+                                this.props.updateValues(key, resp.response);
+                                if (reload) {
+                                    this.setState({ loading: false });
+                                } else {
+                                    this.setState({ step: this.state.step+1, loading: false });
+                                }
                             }
                         } else if (Array.isArray(resp.response) && resp.response.length === 1) {
                             if (typeof postProcess == 'function') {
-                                resp.response = postProcess(resp.response[0]);
+                                var post = postProcess(resp.response[0]);
+                                if (typeof post.then === 'function') {
+                                    post.then(r => {
+                                        this.props.updateValues(key, r);
+                                        if (reload) {
+                                            this.setState({ loading: false });
+                                        } else {
+                                            this.setState({ step: this.state.step+1, loading: false });
+                                        }
+                                    });
+                                } else {
+                                    resp.response = post;
+                                    this.props.updateValues(key, resp.response);
+                                    if (reload) {
+                                        this.setState({ loading: false });
+                                    } else {
+                                        this.setState({ step: this.state.step+1, loading: false });
+                                    }
+                                }
+                            } else {
+                                this.props.updateValues(key, resp.response[0]);
+                                if (reload) {
+                                    this.setState({ loading: false });
+                                } else {
+                                    this.setState({ step: this.state.step+1, loading: false });
+                                }
                             }
-                            resp.response = resp.response[0];
-                        }
-                        this.props.updateValues(key, resp.response);
-                        if (reload) {
-                            this.setState({ loading: false });
-                        } else {
-                            this.setState({ step: this.state.step+1, loading: false });
                         }
                     } else {
                         this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
                     }
-                } catch {
+                } catch (e) {
+                    console.log(e);
                     this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
                 }
             }).catch((e) => {
+                console.log(e);
                 this.setState({ errorMsg: 'An unkown error occured. Please try again.', error: true, loading: false });
             });
         }

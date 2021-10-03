@@ -243,7 +243,10 @@ class LandingPage extends React.Component {
                     </FormController>
                 </div>
                 <div step='2' title='Landing Page'>
-                    <LandingPageView page={this.state.values.page} />
+                    {console.log(this.state.values.page)}
+                    {this.state.values.page ?
+                        <LandingPageView page={this.state.values.page} />
+                    : null}
                 </div>
             </StepContainer>
         );
